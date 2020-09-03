@@ -1,5 +1,5 @@
 import React from 'react';
-import Svg from './components/Svg';
+import SvgContainer from './components/SvgContainer';
 
 import './App.css';
 
@@ -7,9 +7,9 @@ function App() {
   return (
       <body className="App-header">
         <h2>
-          Ejemplo utilizacion d3 con react
+           d3 and react example
         </h2>
-        <div><Svg/></div>
+        <div><SvgContainer/></div>
     </body>
   );
 }
