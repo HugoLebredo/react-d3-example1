@@ -9,7 +9,7 @@ function App() {
         <h2>
            d3 and react example
         </h2>
-        <div><SvgContainer/></div>
+        <SvgContainer/>
     </body>
   );
 }
