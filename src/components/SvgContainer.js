@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
+import chroma from 'chroma-js';
 
 import transformExpenses from '../services/transformExpenses';
 import expensesRaw from '../data/expenses';
@@ -9,11 +10,15 @@ var height = 900;
 var radius = 20;
 //var expenses = expensesRaw;
 var expenses = transformExpenses(expensesRaw);
+var expensesExtent = d3.extent(expenses, d => d.Amount);
+
 //d3 functions
-//var 
+//var
+const colorScale = chroma.scale(['#fafa6e', 'lightgreen','008ae5']);
+const amountScale = d3.scaleLinear().domain(expensesExtent);
 var simulation = d3.forceSimulation()
     .force('center',d3.forceCenter(width/2,height/2))
-    .force('charge',d3.forceManyBody())
+    .force('charge',d3.forceManyBody(-10))
     .force('collide', d3.forceCollide(10))
     .stop();
 
@@ -48,6 +53,7 @@ class ChartContainer extends Component {
         this.circles = this.circles.enter().append('circle')
                         .merge(this.circles)
                         .attr('r',d => radius)
+                        .attr('fill', d => colorScale(amountScale(d.Amount)))
                         .attr('opacity',0.5);
     }
 
