@@ -1,31 +1,20 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 
-var expenses = [
-    {
-        name: "Coffee",
-        amount: 40,
-        date: new Date()
-    },
-    {
-        name: "Sandwich",
-        amount: 58,
-        date: new Date()
-    },
-    {
-        name: "Carrot",
-        amount: 10,
-        date: new Date()
-    }
-];
+import transformExpenses from '../services/transformExpenses';
+import expensesRaw from '../data/expenses';
 
 var width = 900;
-var height = 400;
+var height = 900;
 var radius = 20;
+//var expenses = expensesRaw;
+var expenses = transformExpenses(expensesRaw);
+//d3 functions
+//var 
 var simulation = d3.forceSimulation()
     .force('center',d3.forceCenter(width/2,height/2))
-    //.force('charge',d3.forceManyBody())
-    .force('collide', d3.forceCollide(radius))
+    .force('charge',d3.forceManyBody())
+    .force('collide', d3.forceCollide(10))
     .stop();
 
 class ChartContainer extends Component {
@@ -33,15 +22,14 @@ class ChartContainer extends Component {
     constructor(props){
         super(props);
         this.forceTick = this.forceTick.bind(this);
+        simulation.on('tick',this.forceTick);
     }
 
     componentDidMount(){
         this.container = d3.select(this.refs.container);
         this.renderCircles();
-        //simulation.on('tick',this.forceTick);
         simulation.nodes(expenses).alpha(0.9).restart();
-        simulation.on('tick',this.forceTick);
-
+        console.log(expenses);
     }
 
     componentDidUpdate(){
