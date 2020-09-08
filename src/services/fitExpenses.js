@@ -25,8 +25,17 @@ const fitExpenses =  (data) => {
                                 })
                             })
                         }).flatten().value()
-
-    return(UltimateData);
+    
+    var weeks = d3.timeWeek.range(weeksExtent[0],d3.timeWeek.offset(weeksExtent[1],1))
+    
+    weeks = weeks.map(week => {
+        return{
+            week,
+            x: margin.left,
+            y: yScale(week) + height
+        }
+    })
+    return(weeks);
 }
 
 export default fitExpenses;
