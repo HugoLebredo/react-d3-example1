@@ -2,30 +2,39 @@ import React, { Component } from 'react';
 import * as d3 from 'd3';
 import chroma from 'chroma-js';
 
-import transformExpenses from '../services/transformExpenses';
+import fitExpenses from '../services/fitExpenses';
+
+import transformTest from '../services/transformTest';
 import expensesRaw from '../data/expenses';
 
-var width = 900;
-var height = 900;
-var radius = 20;
-//var expenses = expensesRaw;
-var expenses = transformExpenses(expensesRaw);
+import {width,height, radius} from '../data/config';
+
+//var expenses = transformExpenses(expensesRaw);
+var expenses = transformTest(expensesRaw);
+
 var expensesExtent = d3.extent(expenses, d => d.Amount);
 
 //d3 functions
 //var
-const colorScale = chroma.scale(['#fafa6e', 'lightgreen','008ae5']);
-const amountScale = d3.scaleLinear().domain(expensesExtent);
+
+const colorScale = chroma.scale(['#42e9f5', 'lightblue', '#ff69b6']);
+const amountScale = d3.scaleLog().domain(expensesExtent);
+
 var simulation = d3.forceSimulation()
-    .force('center',d3.forceCenter(width/2,height/2))
-    .force('charge',d3.forceManyBody(-10))
-    .force('collide', d3.forceCollide(10))
+    //.force('center',d3.forceCenter(width/2,height/2))
+    //.force('charge',d3.forceManyBody(100))
+    .force('collide', d3.forceCollide(radius))
+    .force('x',d3.forceX(d => d.focusX))
+    .force('y',d3.forceY(d => d.focusY))
     .stop();
 
-class ChartContainer extends Component {
+class SvgContainer extends Component {
 
     constructor(props){
         super(props);
+        //this.props.expenses = fitExpenses(this.props.expenses)
+        console.log(this.props.expenses);
+        this.state = {selectedWeek: null};
         this.forceTick = this.forceTick.bind(this);
         simulation.on('tick',this.forceTick);
     }
@@ -34,11 +43,10 @@ class ChartContainer extends Component {
         this.container = d3.select(this.refs.container);
         this.renderCircles();
         simulation.nodes(expenses).alpha(0.9).restart();
-        console.log(expenses);
     }
 
     componentDidUpdate(){
-        this.renderCircles();
+       this.renderCircles();
     }
 
     renderCircles(){
@@ -53,10 +61,13 @@ class ChartContainer extends Component {
         this.circles = this.circles.enter().append('circle')
                         .merge(this.circles)
                         .attr('r',d => radius)
+                        .attr('fill-opacity',0.25)
+                        .attr('stroke-width', 3)
+                        .merge(this.circles)
                         .attr('fill', d => colorScale(amountScale(d.Amount)))
-                        .attr('opacity',0.5);
+                        .attr('stroke', d => colorScale(amountScale(d.Amount)));              
     }
-
+  
     forceTick(){
         this.circles.attr('cx', d => d.x)
                     .attr('cy', d => d.y)
@@ -65,11 +76,10 @@ class ChartContainer extends Component {
     render(){
         return (
             <div>
-                <h1>Elemento Svg</h1>
-                <svg width={width} height={height} ref="container"></svg>
+                <svg width={width} height={height * 2} ref="container"></svg>
             </div>
         )
     }
 }
 
-export default ChartContainer;
+export default SvgContainer;
