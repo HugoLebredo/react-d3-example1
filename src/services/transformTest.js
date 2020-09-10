@@ -4,8 +4,9 @@ import * as d3 from 'd3';
 import { width, height, margin, daysOfTheWeek } from '../data/config';
 
 const xScale = d3.scaleBand().domain(_.map(daysOfTheWeek,0))
+
                              .range([margin.left, width - margin.right]);
-                           // .range([margin.left, width - margin.right]);
+
 
 var selectedWeekRadius = (width - margin.left - margin.right) / 2;
 

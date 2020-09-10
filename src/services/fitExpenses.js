@@ -12,7 +12,7 @@ const fitExpenses =  (data) => {
 
     const yScale = d3.scaleLinear().domain(weeksExtent)
                                     .range([height-margin.bottom, margin.top]);
-    
+
     var weeks = d3.timeWeek.range(weeksExtent[0],
                                 d3.timeWeek.offset(weeksExtent[1],1))
     
@@ -23,8 +23,9 @@ const fitExpenses =  (data) => {
             y: yScale(week) + height
         }
     })
-    
+
    return(weeks);
+
 }
 
 export default fitExpenses;

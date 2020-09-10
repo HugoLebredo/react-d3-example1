@@ -19,8 +19,10 @@ class App extends Component {
     this.nextWeek = this.nextWeek.bind(this);
   }
 
+
   componentWillMount(){
     var expenses = parseExpenses(expensesData);
+
     var selectedWeek = d3.max(Object.keys(expenses),d => new Date(d));
     this.setState({expenses, selectedWeek});
   }
