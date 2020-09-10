@@ -3,7 +3,6 @@ import * as d3 from 'd3';
 import chroma from 'chroma-js';
 
 import fitExpenses from '../services/fitExpenses';
-
 import transformTest from '../services/transformTest';
 import parseDaysOfWeek from '../services/parseDaysOfWeek';
 
@@ -28,13 +27,13 @@ class SvgContainer extends Component {
 
     constructor(props){
         super(props);
-        //this.props.expenses = fitExpenses(this.props.expenses)
         this.state = {selectedWeek: null};
         this.forceTick = this.forceTick.bind(this);
         simulation.on('tick',this.forceTick);
     }
 
     componentDidMount(){
+        //console.log(this.props.expenses);
         this.container = d3.select(this.refs.container);
         this.calculateData();
         this.renderDayCircles();
@@ -52,6 +51,14 @@ class SvgContainer extends Component {
 
     calculateData(){
         this.expenses = transformTest(this.props.expenses,this.props.selectedWeek);
+        this.weeks = fitExpenses(this.props.expenses);
+        this.daysofweek = parseDaysOfWeek(daysOfTheWeek);
+        var expensesExtent = d3.extent(this.expenses, d => d.Amount);
+        amountScale.domain(expensesExtent);
+    }
+
+    calculateData(){
+        this.expenses = transformTest(expensesRaw);
         this.weeks = fitExpenses(this.props.expenses);
         this.daysofweek = parseDaysOfWeek(daysOfTheWeek);
         var expensesExtent = d3.extent(this.expenses, d => d.Amount);

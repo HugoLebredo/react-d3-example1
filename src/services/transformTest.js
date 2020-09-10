@@ -6,6 +6,7 @@ import { width, height, marginq } from '../data/config';
 const xScale = d3.scaleLinear().domain([0, 6])
                              .range([margin.left, width - margin.right]);
 
+
 var selectedWeekRadius = (width - margin.left - margin.right) / 2;
 
 const trasformTest = (data,selectedWeek) => {
