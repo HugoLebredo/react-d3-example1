@@ -14,6 +14,8 @@ const colorScale = chroma.scale(['#42e9f5', 'lightblue', '#ff69b6']);
 const amountScale = d3.scaleLog();
 
 var simulation = d3.forceSimulation()
+    .alphaDecay(0.001)
+    .velocityDecay(0.3)
     //.force('center',d3.forceCenter(width/2,height/2))
     //.force('charge',d3.forceManyBody(100))
     .force('collide', d3.forceCollide(radius))
@@ -48,7 +50,6 @@ class SvgContainer extends Component {
     }
 
     calculateData(){
-        console.log(this.props)
         this.expenses = transformTest(this.props.expenses,this.props.selectedWeek);
         this.weeks = fitExpenses(this.props.expenses);
         this.daysofweek = parseDaysOfWeek(daysOfTheWeek);
