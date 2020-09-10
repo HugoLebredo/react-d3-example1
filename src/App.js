@@ -13,22 +13,38 @@ class App extends Component {
     this.state = {
       expenses: [],
       selectedWeek:null
-    }
+    };
+
+    this.prevWeek = this.prevWeek.bind(this);
+    this.nextWeek = this.nextWeek.bind(this);
   }
+
 
   componentWillMount(){
     var expenses = parseExpenses(expensesData);
-    var selectedWeek = d3.max(expenses,day => d3.timeWeek.floor(day.date));
+
+    var selectedWeek = d3.max(Object.keys(expenses),d => new Date(d));
     this.setState({expenses, selectedWeek});
   }
+
+  prevWeek(){
+    var selectedWeek = d3.timeWeek.offset(this.state.selectedWeek,-1);
+    this.setState({selectedWeek});
+      }
+
+  nextWeek(){
+    var selectedWeek = d3.timeWeek.offset(this.state.selectedWeek,1);
+    this.setState({selectedWeek});
+  }
+
   render(){
       var formatweek = d3.timeFormat('%d %B %Y')(this.state.selectedWeek)
     return(
       <div>
         <h2>
-          <span onClick = {this.prevWeek}>←</span>
+          <span style={{cursor: 'pointer'}} onClick = {this.prevWeek}>←</span>
           {formatweek}
-          <span onClick = {this.nextWeek}>→</span>
+          <span style={{cursor: 'pointer'}}  onClick = {this.nextWeek}>→</span>
         </h2>
         <SvgContainer {...this.state}/>
       </div>
