@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import * as d3 from 'd3';
 
-const parseExpenses = data => (
-    _.chain(data)
+const parseExpenses = data =>(
+   _.chain(data)
     .filter(d => d.Amount < 0)
     .map(d => {
         const { Description } = d;
@@ -10,10 +10,11 @@ const parseExpenses = data => (
             return{
                 Description,
                 Amount: d.Amount < 0 ? -d.Amount : d.Amount,
-                date, 
+                date,
+                WeekDay: date.getDay() 
                 }
         }
-    ).value()//.groupBy(d => d3.timeWeek.floor(d.date)).value()
+    ).groupBy(d => d3.timeWeek.floor(d.date)).value()
 )
   
 export default parseExpenses;
