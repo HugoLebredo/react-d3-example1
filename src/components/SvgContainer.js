@@ -33,7 +33,6 @@ class SvgContainer extends Component {
     }
 
     componentDidMount(){
-        //console.log(this.props.expenses);
         this.container = d3.select(this.refs.container);
         this.calculateData();
         this.renderDayCircles();
@@ -50,15 +49,8 @@ class SvgContainer extends Component {
     }
 
     calculateData(){
-        this.expenses = transformTest(this.props.expenses,this.props.selectedWeek);
-        this.weeks = fitExpenses(this.props.expenses);
-        this.daysofweek = parseDaysOfWeek(daysOfTheWeek);
-        var expensesExtent = d3.extent(this.expenses, d => d.Amount);
-        amountScale.domain(expensesExtent);
-    }
-
-    calculateData(){
-        this.expenses = transformTest(expensesRaw);
+        //this.expenses = transformTest(this.props.expenses,this.props.selectedWeek);
+        this.expenses = transformTest(this.props);
         this.weeks = fitExpenses(this.props.expenses);
         this.daysofweek = parseDaysOfWeek(daysOfTheWeek);
         var expensesExtent = d3.extent(this.expenses, d => d.Amount);

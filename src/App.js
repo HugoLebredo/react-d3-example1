@@ -12,7 +12,7 @@ class App extends Component {
     super(props);
     this.state = {
       expenses: [],
-      selectedWeek:null
+      selectedWeek: null
     };
 
     this.prevWeek = this.prevWeek.bind(this);
