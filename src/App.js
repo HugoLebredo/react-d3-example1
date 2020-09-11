@@ -15,6 +15,9 @@ class App extends Component {
     super(props);
     this.state = {
       expenses: [],
+      categories:[{name:'Parking',expenses:[],total:0},
+                  {name:'Restaurants',expenses:[],total:0}
+                ],
       selectedWeek: null
     };
 
