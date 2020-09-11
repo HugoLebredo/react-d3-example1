@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 
-import SvgContainer from './components/SvgContainer';
+import Expenses from './components/Expenses';
+import Categories from './components/Categories';
 import parseExpenses from './services/parseExpenses';
 import expensesData from './data/expenses';
+
+import {width, height} from './data/config';
 
 import './App.css';
 
@@ -46,7 +49,11 @@ class App extends Component {
           {formatweek}
           <span style={{cursor: 'pointer'}}  onClick = {this.nextWeek}>→</span>
         </h2>
-        <SvgContainer {...this.state}/>
+        <svg width={width} height={height * 2}>
+          <Expenses {...this.state}/>
+          <Categories {...this.state}/>
+        </svg>
+       
       </div>
       )
     };

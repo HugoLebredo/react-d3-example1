@@ -23,7 +23,7 @@ var simulation = d3.forceSimulation()
     .force('y',d3.forceY(d => d.focusY))
     .stop();
 
-class SvgContainer extends Component {
+class Expenses extends Component {
 
     constructor(props){
         super(props);
@@ -49,7 +49,6 @@ class SvgContainer extends Component {
     }
 
     calculateData(){
-        //this.expenses = transformTest(this.props.expenses,this.props.selectedWeek);
         this.expenses = transformTest(this.props);
         this.weeks = fitExpenses(this.props.expenses);
         this.daysofweek = parseDaysOfWeek(daysOfTheWeek);
@@ -84,7 +83,7 @@ class SvgContainer extends Component {
                         .classed('days',true)
                         .attr('transform', d => 'translate('+[d.cx,d.cy]+')');
 
-        var daysRadius = 80;
+        var daysRadius = 60;
         var fontSize = 15;
 
         days.append('circle')
@@ -133,11 +132,11 @@ class SvgContainer extends Component {
 
     render(){
         return (
-            <div>
-                <svg width={width} height={height * 2} ref="container"></svg>
-            </div>
+ 
+                <g ref="container"></g>
+
         )
     }
 }
 
-export default SvgContainer;
+export default Expenses;
