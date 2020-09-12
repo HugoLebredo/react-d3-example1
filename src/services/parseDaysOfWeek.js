@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import {width, margin, daysOfTheWeek} from '../data/config';
+import {width, margin} from '../data/config';
 
 var selectedWeekRadius = (width - margin.left - margin.right) / 2;
 

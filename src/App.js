@@ -1,22 +1,32 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
+import _ from 'lodash';
 
-import SvgContainer from './components/SvgContainer';
+import Expenses from './components/Expenses';
+import Categories from './components/Categories';
 import parseExpenses from './services/parseExpenses';
 import expensesData from './data/expenses';
+
+import {width, height} from './data/config';
 
 import './App.css';
 
 class App extends Component {
   constructor(props){
+    
     super(props);
+
     this.state = {
       expenses: [],
-      selectedWeek:null
+      categories:[{name:'Parking',expenses:[],total:0},
+                  {name:'Restaurants',expenses:[],total:0}
+                ],
+      selectedWeek: null
     };
 
     this.prevWeek = this.prevWeek.bind(this);
     this.nextWeek = this.nextWeek.bind(this);
+    this.linkToCategory = this.linkToCategory.bind(this);
   }
 
 
@@ -37,7 +47,18 @@ class App extends Component {
     this.setState({selectedWeek});
   }
 
+  linkToCategory(expense, category){
+    category.expenses.push(expense)
+    category.total = _.sumBy(category.expenses,'Amount');
+    this.forceUpdate();
+      console.log(category.expenses,category.total)
+  }
+
   render(){
+      var props = {
+        linkToCategory: this.linkToCategory
+      }
+
       var formatweek = d3.timeFormat('%d %B %Y')(this.state.selectedWeek)
     return(
       <div>
@@ -46,7 +67,11 @@ class App extends Component {
           {formatweek}
           <span style={{cursor: 'pointer'}}  onClick = {this.nextWeek}>→</span>
         </h2>
-        <SvgContainer {...this.state}/>
+        <svg width={width} height={height * 2}>
+          <Expenses {...props} {...this.state}/>
+          <Categories {...props} {...this.state}/>
+        </svg>
+       
       </div>
       )
     };
