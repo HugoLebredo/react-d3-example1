@@ -9,7 +9,6 @@ import parseDaysOfWeek from '../services/parseDaysOfWeek';
 import {width, height, margin, radius, daysOfTheWeek} from '../data/config';
 
 //d3 functions
-
 const colorScale = chroma.scale(['#42e9f5', 'lightblue', '#ff69b6']);
 const amountScale = d3.scaleLog();
 
@@ -22,6 +21,8 @@ var simulation = d3.forceSimulation()
     .force('x',d3.forceX(d => d.focusX))
     .force('y',d3.forceY(d => d.focusY))
     .stop();
+
+var drag = d3.drag();
 
 class Expenses extends Component {
 
@@ -39,14 +40,21 @@ class Expenses extends Component {
         this.renderWeeks();
         this.renderCircles();
         simulation.nodes(this.expenses).alpha(0.9).restart();
+
+        //This other examples drag is used in componentWillmount
+        drag.on('start',this.dragStart)
+        .on('drag',this.dragExpense)
+        .on('end',this.dragEnd);
     }
 
     componentDidUpdate(){
+        //Needed for the transition when we do click iver the arrows
         this.calculateData();
         this.renderCircles();
 
         simulation.nodes(this.expenses).alpha(0.9).restart();
     }
+
 
     calculateData(){
         this.expenses = transformTest(this.props);
@@ -71,6 +79,7 @@ class Expenses extends Component {
                         .attr('r',d => radius)
                         .attr('fill-opacity',0.25)
                         .attr('stroke-width', 3)
+                        .call(drag)
                         .merge(this.circles)
                         .attr('fill', d => colorScale(amountScale(d.Amount)))
                         .attr('stroke', d => colorScale(amountScale(d.Amount)));              
@@ -125,11 +134,32 @@ class Expenses extends Component {
 
     }
   
-    forceTick(){
+    forceTick() {
         this.circles.attr('cx', d => d.x)
                     .attr('cy', d => d.y)
     }
+    
+    dragstarted(event, d) {
+        d3.select(this).raise().attr("stroke", "black");
+      }
 
+    dragStart(event) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        event.subject.fx = event.subject.x;
+        event.subject.fy = event.subject.y;
+    }
+  
+    dragExpense(event) {
+        event.subject.fx = event.x;
+        event.subject.fy = event.y;
+    }
+    
+    dragEnd(event) {
+        if (!event.active) simulation.alphaTarget(0);
+        event.subject.fx = null;
+        event.subject.fy = null;
+    }
+    
     render(){
         return (
  
