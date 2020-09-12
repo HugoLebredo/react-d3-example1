@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
+import _ from 'lodash';
 
 import Expenses from './components/Expenses';
 import Categories from './components/Categories';
@@ -47,7 +48,10 @@ class App extends Component {
   }
 
   linkToCategory(expense, category){
-      console.log(expense,category)
+    category.expenses.push(expense)
+    category.total = _.sumBy(category.expenses,'Amount');
+    this.forceUpdate();
+      console.log(category.expenses,category.total)
   }
 
   render(){
