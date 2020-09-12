@@ -3,11 +3,11 @@ import * as d3 from 'd3';
 import _ from 'lodash';
 import {width, height } from '../data/config'
 
-var radiusScale = d3.scaleLinear().range([10,50]);
+var radiusScale = d3.scaleLinear().range([15,50]);
 var simulation = d3.forceSimulation()
     .alphaDecay(0.001)
     .velocityDecay(0.3)
-    .force('collide', d3.forceCollide(d => d.radius))
+    .force('collide', d3.forceCollide(d => d.radius +5))
     .force('x',d3.forceX(d => d.focusX))
     .force('y',d3.forceY(d => d.focusY))
     .stop();
@@ -24,7 +24,7 @@ class App extends Component {
 
     componentDidMount(){
         //this.container = d3.select(this.useRef.contenedor);
-        this.container = d3.select(this.refs.container);
+        this.container = d3.select(this.refs.categoryContainer);
         this.calculateData();
         this.renderCircles();
 
@@ -81,7 +81,7 @@ class App extends Component {
 
     render() {
         return (
-            <g ref="container"/>
+            <g ref="categoryContainer"/>
         );
     }
 }
