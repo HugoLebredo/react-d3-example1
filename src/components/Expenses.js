@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import chroma from 'chroma-js';
+import _ from 'lodash';
 
 import fitExpenses from '../services/fitExpenses';
 import transformTest from '../services/transformTest';
@@ -30,6 +31,11 @@ class Expenses extends Component {
         super(props);
         this.state = {selectedWeek: null};
         this.forceTick = this.forceTick.bind(this);
+
+        this.dragStart = this.dragStart.bind(this);
+        this.dragExpense = this.dragExpense.bind(this);
+        this.dragEnd = this.dragEnd.bind(this);
+
         simulation.on('tick',this.forceTick);
     }
 
@@ -139,10 +145,6 @@ class Expenses extends Component {
                     .attr('cy', d => d.y)
     }
     
-    dragstarted(event, d) {
-        d3.select(this).raise().attr("stroke", "black");
-      }
-
     dragStart(event) {
         if (!event.active) simulation.alphaTarget(0.3).restart();
         event.subject.fx = event.subject.x;
@@ -150,16 +152,43 @@ class Expenses extends Component {
     }
   
     dragExpense(event) {
+        this.dragged = null;
+
         event.subject.fx = event.x;
         event.subject.fy = event.y;
+
+        var expenseX = event.x;
+        var expenseY = event.y;
+        var expense = event.subject;
+       
+        //checking if the position of the expense is into some category area
+        // If is true the expense and category are assigned to the global variable "dragged"
+        //it isnt required div the radius. Its a way to drag the expense to the center 
+        //of the category center for doing the append
+        _.each(this.props.categories, category => {
+            var {x, y, radius} = category
+            if(x - radius/2 < expenseX && x + radius/2 > expenseX &&
+                y - radius/2 < expenseY && y + radius/2 > expenseY) {
+                    this.dragged = {expense, category};
+                }
+            }
+         )
     }
     
     dragEnd(event) {
+        
         if (!event.active) simulation.alphaTarget(0);
         event.subject.fx = null;
         event.subject.fy = null;
+
+        //The value of "dragged" is sent only when the drag ends
+        if (this.dragged){
+            var {expense, category} = this.dragged;     
+            this.props.linkToCategory(expense, category);
+        }
+        this.dragged = null;
     }
-    
+
     render(){
         return (
  

@@ -12,7 +12,9 @@ import './App.css';
 
 class App extends Component {
   constructor(props){
+    
     super(props);
+
     this.state = {
       expenses: [],
       categories:[{name:'Parking',expenses:[],total:0},
@@ -23,6 +25,7 @@ class App extends Component {
 
     this.prevWeek = this.prevWeek.bind(this);
     this.nextWeek = this.nextWeek.bind(this);
+    this.linkToCategory = this.linkToCategory.bind(this);
   }
 
 
@@ -43,7 +46,15 @@ class App extends Component {
     this.setState({selectedWeek});
   }
 
+  linkToCategory(expense, category){
+      console.log(expense,category)
+  }
+
   render(){
+      var props = {
+        linkToCategory: this.linkToCategory
+      }
+
       var formatweek = d3.timeFormat('%d %B %Y')(this.state.selectedWeek)
     return(
       <div>
@@ -53,8 +64,8 @@ class App extends Component {
           <span style={{cursor: 'pointer'}}  onClick = {this.nextWeek}>→</span>
         </h2>
         <svg width={width} height={height * 2}>
-          <Expenses {...this.state}/>
-          <Categories {...this.state}/>
+          <Expenses {...props} {...this.state}/>
+          <Categories {...props} {...this.state}/>
         </svg>
        
       </div>
