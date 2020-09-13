@@ -54,7 +54,7 @@ class App extends Component {
     }
 
     renderLinks(){
-        this.lines = this.container.selectAll('lines')
+        this.lines = this.container.selectAll('line')
             .data(this.props.links)
         
         //exit
@@ -62,8 +62,8 @@ class App extends Component {
 
         //enter
         this.lines = this.lines.enter().insert('line','g')
-            .attr('stroke','#666')
-            .merge(this.lines);
+            .merge(this.lines)
+            .attr('stroke','#666');
     }
 
     renderCircles(){
