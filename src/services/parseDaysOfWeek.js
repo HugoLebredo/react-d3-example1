@@ -13,8 +13,8 @@ const parseDaysOfWeek = (daysOfWeek) => {
                             var angle = Math.PI - perAngle * dayOfweek;
                             var cx =  selectedWeekRadius * Math.cos(angle) + selectedWeekRadius + margin.left;
                             var cy =  selectedWeekRadius * Math.sin(angle) + margin.top;
-                            return{
-                                name, cx, cy
+                            return { 
+                                name, cx, cy, dayOfweek, radius: 60
                             }
     })
 
