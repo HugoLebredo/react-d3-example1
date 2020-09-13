@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import _ from 'lodash';
-import {width, height } from '../data/config'
+
+import {width, height } from '../data/config';
 
 var radiusScale = d3.scaleLinear().range([15,50]);
 var simulation = d3.forceSimulation()
@@ -26,6 +27,7 @@ class App extends Component {
         //this.container = d3.select(this.useRef.contenedor);
         this.container = d3.select(this.refs.categoryContainer);
         this.calculateData();
+        this.renderLinks();
         this.renderCircles();
 
         //start simulation every time this event will be called
@@ -34,6 +36,7 @@ class App extends Component {
 
     componentDidUpdate(){
         this.calculateData();
+        this.renderLinks();
         this.renderCircles();
     }
 
@@ -48,6 +51,19 @@ class App extends Component {
                 radius:radiusScale(category.total)
             })
         })
+    }
+
+    renderLinks(){
+        this.lines = this.container.selectAll('line')
+            .data(this.props.links)
+        
+        //exit
+        this.lines.exit().remove();
+
+        //enter
+        this.lines = this.lines.enter().insert('line','g')
+            .merge(this.lines)
+            .attr('stroke','#666');
     }
 
     renderCircles(){
@@ -79,6 +95,10 @@ class App extends Component {
 
     forceTick(){
         this.circles.attr('transform', d => 'translate('+[d.x,d.y]+')');
+        this.lines.attr('x1', d => d.source.x)
+        .attr('y1', d => d.source.y)
+        .attr('x2', d => d.target.x)
+        .attr('y2', d => d.target.y);
     }
 
     render() {
