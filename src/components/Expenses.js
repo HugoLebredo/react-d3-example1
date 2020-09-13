@@ -5,7 +5,6 @@ import _ from 'lodash';
 
 import fitExpenses from '../services/fitExpenses';
 import transformTest from '../services/transformTest';
-import parseDaysOfWeek from '../services/parseDaysOfWeek';
 
 import {width, height, margin, radius, daysOfTheWeek} from '../data/config';
 
@@ -30,6 +29,7 @@ class Expenses extends Component {
     constructor(props){
         super(props);
         this.state = {selectedWeek: null};
+
         this.forceTick = this.forceTick.bind(this);
 
         this.dragStart = this.dragStart.bind(this);
@@ -63,9 +63,23 @@ class Expenses extends Component {
 
 
     calculateData(){
+        var selectedWeekRadius = (width - margin.left - margin.right) / 2;
+        var perAngle = Math.PI/6;  
+        
+        this.days  = _.map(daysOfTheWeek, date => {
+            var [dayOfweek, name] = date;
+            var angle = Math.PI - perAngle * dayOfweek;
+            var cx =  selectedWeekRadius * Math.cos(angle) + selectedWeekRadius + margin.left;
+            var cy =  selectedWeekRadius * Math.sin(angle) + margin.top;
+            return { 
+                date:  d3.timeDay.offset(this.props.selectedWeek,dayOfweek),
+                name, cx, cy,  radius: 60
+            }
+        })
+
         this.expenses = transformTest(this.props);
         this.weeks = fitExpenses(this.props.expenses);
-        this.daysofweek = parseDaysOfWeek(daysOfTheWeek);
+
         var expensesExtent = d3.extent(this.expenses, d => d.Amount);
         amountScale.domain(expensesExtent);
     }
@@ -93,21 +107,20 @@ class Expenses extends Component {
 
     renderDayCircles(){
         var days = this.container.selectAll('.days')
-                        .data(this.daysofweek, d => d.name)
+                        .data(this.days, d => d.name)
                         .enter().append('g')
                         .classed('days',true)
                         .attr('transform', d => 'translate('+[d.cx,d.cy]+')');
 
-        var daysRadius = 60;
         var fontSize = 15;
 
         days.append('circle')
-            .attr('r',d => daysRadius)
+            .attr('r',d => d.radius)
             .attr('opacity',0.25)
             .attr('fill','#97FFD1');
 
         days.append('text')
-            .attr('y',daysRadius + fontSize)
+            .attr('y',d => d.radius + fontSize)
             .attr('text-anchor','middle')
             .attr('dy','.35em')
             .attr('fill','#06DD88')
@@ -169,10 +182,20 @@ class Expenses extends Component {
             var {x, y, radius} = category
             if(x - radius/2 < expenseX && x + radius/2 > expenseX &&
                 y - radius/2 < expenseY && y + radius/2 > expenseY) {
-                    this.dragged = {expense, category};
+                    this.dragged = {expense, category, type: 'category'};
                 }
             }
-         )
+         );
+ 
+        // calculate if the expense is being overlap another dayweek
+        _.each(this.days, day => {
+            var {cx, cy, radius, dayOfweek} = day
+            if(cx - radius < expenseX && cx + radius > expenseX &&
+                cy - radius < expenseY && cy + radius > expenseY) {
+                    this.dragged = {expense, day, type: 'day'};
+                }
+            }
+         );
     }
     
     dragEnd(event) {
@@ -182,10 +205,14 @@ class Expenses extends Component {
         event.subject.fy = null;
 
         //The value of "dragged" is sent only when the drag ends
-        if (this.dragged){
+        if (this.dragged && this.dragged.type == 'category'){
             var {expense, category} = this.dragged;     
             this.props.linkToCategory(expense, category);
+        } else if (this.dragged && this.dragged.type == 'day'){
+            var {expense, day} = this.dragged;
+            this.props.editDate(expense, day);
         }
+
         this.dragged = null;
     }
 

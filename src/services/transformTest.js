@@ -19,17 +19,20 @@ const trasformTest = (data) => {
 
     return (_.chain(expenses)
         .map((week,key) => {
-            key = new Date(key)
+            console.log()
+            key = new Date(key);
             return _.map(week,d => {
-                var focusX = xScale(d.WeekDay);
+                var WeekDay = d.date.getDay();
+                var focusX = xScale(WeekDay);
                 var focusY = yScale(new Date(key)) + height;
                 if (key.getTime() === selectedWeek.getTime()) {
                     var perAngle = Math.PI/6;
-                    var angle = Math.PI - perAngle * d.WeekDay;
+                    var angle = Math.PI - perAngle * WeekDay;
                     focusX = selectedWeekRadius * Math.cos(angle) + selectedWeekRadius + margin.left
                     focusY = selectedWeekRadius * Math.sin(angle) + margin.top
             }
                 return Object.assign(d ,{
+                    WeekDay,
                     focusX,
                     focusY,
                 })
