@@ -22,10 +22,12 @@ class App extends Component {
                   {name:'Restaurants',expenses:[],total:0}
                 ],
       selectedWeek: null,
+      daysOfWeek: null
     };
 
     this.prevWeek = this.prevWeek.bind(this);
     this.nextWeek = this.nextWeek.bind(this);
+    this.editDate = this.editDate.bind(this);
     this.linkToCategory = this.linkToCategory.bind(this);
   }
 
@@ -47,10 +49,21 @@ class App extends Component {
     this.setState({selectedWeek});
   }
 
-  linkToCategory(expense, category){
-    category.expenses.push(expense)
-    category.total = _.sumBy(category.expenses,'Amount');
+  editDate(expense, day){
+      console.log(expense)
+      expense.date = day.date;
+      console.log(expense)
+      this.forceUpdate();
+  }
 
+  linkToCategory(expense, category){
+    if (_.includes(category.expenses, expense)){
+      category.expenses = _.without(category.expense, expense);
+    } else {
+      category.expenses.push(expense)
+    }
+
+    category.total = _.sumBy(category.expenses,'Amount');
     this.forceUpdate();
   }
     //add a link between the category and the expense
@@ -72,15 +85,19 @@ class App extends Component {
 
     var props = {
         linkToCategory: this.linkToCategory,
-        links: links
+        editDate: this.editDate,
+        links: links,
       }
 
+    var style = {
+      margin: 'auto'
+    }
     
     return(
-      <div>
-        <h2>
+      <div className="App" style={style}>
+        <h2 style={{textAlign: 'center'}}>
           <span style={{cursor: 'pointer'}} onClick = {this.prevWeek}>←</span>
-          {formatweek}
+          Weef of {formatweek}
           <span style={{cursor: 'pointer'}}  onClick = {this.nextWeek}>→</span>
         </h2>
         <svg width={width} height={height * 2}>

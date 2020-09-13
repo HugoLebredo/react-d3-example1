@@ -11,8 +11,7 @@ const parseExpenses = data => (
             return{
                 Description,
                 Amount: d.Amount < 0 ? -d.Amount : d.Amount,
-                date,
-                WeekDay: date.getDay() 
+                date
                 }
         }
     ).groupBy(d => d3.timeWeek.floor(d.date)).value()
