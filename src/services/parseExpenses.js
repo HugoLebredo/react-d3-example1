@@ -3,7 +3,6 @@ import * as d3 from 'd3';
 
 const parseExpenses = data => (
     _.chain(data)
-
     .filter(d => d.Amount < 0)
     .map(d => {
         const { Description } = d;
