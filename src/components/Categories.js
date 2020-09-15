@@ -2,16 +2,19 @@ import React, { Component } from 'react';
 import * as d3 from 'd3';
 import _ from 'lodash';
 
-import {width, height } from '../data/config';
+import {width, height,colors } from '../data/config';
 
-var radiusScale = d3.scaleLinear().range([15,50]);
+var radiusScale = d3.scaleLinear().range([50,90]);
+var amountScale =  d3.scaleLinear().range(['#92e0a9','#2ee882'])
 var simulation = d3.forceSimulation()
     .alphaDecay(0.001)
     .velocityDecay(0.3)
-    .force('collide', d3.forceCollide(d => d.radius +5))
+    .force('collide', d3.forceCollide(d => d.radius +15))
     .force('x',d3.forceX(d => d.focusX))
     .force('y',d3.forceY(d => d.focusY))
     .stop();
+
+var drag = d3.drag();
 
 class App extends Component {
     constructor(props){
@@ -19,7 +22,15 @@ class App extends Component {
         this.state = {};
 
         this.forceTick = this.forceTick.bind(this);
+
+        this.dragStart = this.dragStart.bind(this);
+        this.dragExpense = this.dragExpense.bind(this);
+        this.dragEnd = this.dragEnd.bind(this);
+
         simulation.on('tick',this.forceTick);
+        drag.on('start', this.dragStart)
+            .on('drag', this.dragExpense)
+            .on('end', this.dragEnd);
 
     }
 
@@ -43,6 +54,8 @@ class App extends Component {
     calculateData(){
         var radiusExtent = d3.extent(this.props.categories, category => category.total);
         radiusScale.domain(radiusExtent);
+
+        amountScale.domain(radiusExtent)
     
         this.categories = _.map(this.props.categories, category => {
             return Object.assign(category,{
@@ -54,16 +67,18 @@ class App extends Component {
     }
 
     renderLinks(){
-        this.lines = this.container.selectAll('line')
-            .data(this.props.links)
-        
-        //exit
+        this.lines = this.container.selectAll('path')
+        .data(this.props.links);
+  
+      // exit
         this.lines.exit().remove();
-
-        //enter
-        this.lines = this.lines.enter().insert('line','g')
-            .merge(this.lines)
-            .attr('stroke','#666');
+  
+      // enter + update
+        this.lines = this.lines.enter().insert('path', 'g')
+            .attr('stroke', colors.black)
+            .attr('stroke-width', 0.5)
+            .attr('fill', 'none')
+            .merge(this.lines);
     }
 
     renderCircles(){
@@ -77,7 +92,7 @@ class App extends Component {
         //enter
         var enter = this.circles.enter().append('g');
         enter.append('circle')
-            .attr('fill','#fff')
+            .attr('fill',d => amountScale(d.total))
             .attr('stroke','#666')
             .attr('stroke-width',2)
         
@@ -95,12 +110,44 @@ class App extends Component {
 
     forceTick(){
         this.circles.attr('transform', d => 'translate('+[d.x,d.y]+')');
-        this.lines.attr('x1', d => d.source.x)
+        //
+        this.lines
+            .attr('transform', d => {
+                var angle = Math.atan2(d.target.y - d.source.y, d.target.x - d.source.x);
+                angle *= (180 / Math.PI);
+                return'translate(' + [d.source.x, d.source.y] + ')rotate(' + angle + ')';
+            }).attr('d', d => {
+                var direction = d.source.date.getDay() < 3 ? -1 : 1;
+                // calculate distance between source and target
+                var dist = Math.sqrt(Math.pow(d.target.x - d.source.x, 2) + Math.pow(d.target.y - d.source.y, 2));
+                return 'M0,0 Q' + [dist / 2, direction * dist / 3] + ' ' + [dist, 0];
+            });
+        //simple line depreciated
+        /*this.lines.attr('x1', d => d.source.x)
         .attr('y1', d => d.source.y)
         .attr('x2', d => d.target.x)
         .attr('y2', d => d.target.y);
+        */
     }
+    dragStart(event) {
+        simulation.alphaTarget(0.3).restart();
+        event.subject.fx = event.subject.x;
+        event.subject.fy = event.subject.y;
+    
+        this.deleteIcon.style('display', 'block');
+      }
+    
+      dragExpense(event) {
+        event.subject.fx = event.x;
+        event.subject.fy = event.y;
+      }
+    
+      dragEnd(event) {
+        if (!event.active) simulation.alphaTarget(0);
+        event.subject.fx = null;
+        event.subject.fy = null;
 
+      } 
     render() {
         return (
             <g ref="categoryContainer"/>

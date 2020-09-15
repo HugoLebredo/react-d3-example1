@@ -3,6 +3,8 @@ import * as d3 from 'd3';
 
 import { width, height, margin } from '../data/config';
 
+var dayHeight = 75;
+
 const xScale = d3.scaleLinear().domain([0, 6])
                              .range([margin.left, width - margin.right]);
 
@@ -19,22 +21,20 @@ const trasformTest = (data) => {
 
     return (_.chain(expenses)
         .map((week,key) => {
-            console.log()
             key = new Date(key);
             return _.map(week,d => {
                 var WeekDay = d.date.getDay();
                 var focusX = xScale(WeekDay);
                 var focusY = yScale(new Date(key)) + height;
                 if (key.getTime() === selectedWeek.getTime()) {
-                    var perAngle = Math.PI/6;
-                    var angle = Math.PI - perAngle * WeekDay;
-                    focusX = selectedWeekRadius * Math.cos(angle) + selectedWeekRadius + margin.left
-                    focusY = selectedWeekRadius * Math.sin(angle) + margin.top
+                   var offset = Math.abs(3 - WeekDay);
+                   focusY = height - 2 * dayHeight - 0.5 * offset * dayHeight;
+
             }
                 return Object.assign(d ,{
                     WeekDay,
                     focusX,
-                    focusY,
+                    focusY:focusY + 125,
                 })
             })
         }).flatten().value()

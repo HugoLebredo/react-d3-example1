@@ -6,7 +6,7 @@ import _ from 'lodash';
 import fitExpenses from '../services/fitExpenses';
 import transformTest from '../services/transformTest';
 
-import {width, height, margin, radius, daysOfTheWeek} from '../data/config';
+import {width, height, margin, radius, daysOfTheWeek, colors} from '../data/config';
 
 //d3 functions
 const colorScale = chroma.scale(['#42e9f5', 'lightblue', '#ff69b6']);
@@ -42,8 +42,8 @@ class Expenses extends Component {
     componentDidMount(){
         this.container = d3.select(this.refs.container);
         this.calculateData();
-        this.renderDayCircles();
-        this.renderWeeks();
+        //this.renderDayCircles();
+        //this.renderWeeks();
         this.renderCircles();
         simulation.nodes(this.expenses).alpha(0.9).restart();
 
@@ -63,6 +63,8 @@ class Expenses extends Component {
 
 
     calculateData(){
+
+        //render week days of top
         var selectedWeekRadius = (width - margin.left - margin.right) / 2;
         var perAngle = Math.PI/6;  
         
@@ -97,12 +99,13 @@ class Expenses extends Component {
                         .classed('expenses',true)
                         .merge(this.circles)
                         .attr('r',d => radius)
-                        .attr('fill-opacity',0.25)
-                        .attr('stroke-width', 3)
+                        .attr('fill-opacity',1)
+                        .attr('stroke-width', 5)
+                        .attr("stroke-opacity", 0)
                         .call(drag)
                         .merge(this.circles)
-                        .attr('fill', d => colorScale(amountScale(d.Amount)))
-                        .attr('stroke', d => colorScale(amountScale(d.Amount)));              
+                        .attr('fill', d => colors.white)
+                        .attr('stroke', d => colors.white);              
     }
 
     renderDayCircles(){
@@ -126,7 +129,6 @@ class Expenses extends Component {
             .attr('fill','#06DD88')
             .attr('font-weight',600)
             .text(d => d.name);
-
     }
 
     renderWeeks(){

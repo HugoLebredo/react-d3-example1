@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import _ from 'lodash';
 
 import Expenses from './components/Expenses';
+import Day from './components/Day';
 import Categories from './components/Categories';
 import parseExpenses from './services/parseExpenses';
 import expensesData from './data/expenses';
@@ -19,7 +20,8 @@ class App extends Component {
     this.state = {
       expenses: [],
       categories:[{name:'Parking',expenses:[],total:0},
-                  {name:'Restaurants',expenses:[],total:0}
+                  {name:'Restaurants',expenses:[],total:0},
+                  {name:'Travels',expenses:[],total:0}
                 ],
       selectedWeek: null,
       daysOfWeek: null
@@ -95,12 +97,13 @@ class App extends Component {
     
     return(
       <div className="App" style={style}>
-        <h2 style={{textAlign: 'center'}}>
+        <h1 style={{textAlign: 'center'}}>
           <span style={{cursor: 'pointer'}} onClick = {this.prevWeek}>←</span>
           Weef of {formatweek}
           <span style={{cursor: 'pointer'}}  onClick = {this.nextWeek}>→</span>
-        </h2>
-        <svg width={width} height={height * 2}>
+        </h1>
+        <svg width={width} height={height * 3}>
+          <Day {...props} {...this.state}/>
           <Expenses {...props} {...this.state}/>
           <Categories {...props} {...this.state}/>
         </svg>
