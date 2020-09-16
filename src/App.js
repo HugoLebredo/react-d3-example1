@@ -99,7 +99,7 @@ class App extends Component {
       <div className="App" style={style}>
         <h1 style={{textAlign: 'center'}}>
           <span style={{cursor: 'pointer'}} onClick = {this.prevWeek}>←</span>
-          Weef of {formatweek}
+          Week of {formatweek}
           <span style={{cursor: 'pointer'}}  onClick = {this.nextWeek}>→</span>
         </h1>
         <svg width={width} height={height * 3}>

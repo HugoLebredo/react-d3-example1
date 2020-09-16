@@ -8,6 +8,9 @@ import transformTest from '../services/transformTest';
 
 import {width, height, margin, radius, daysOfTheWeek, colors} from '../data/config';
 
+var dayWidth = 50;
+var dayHeight = 80;
+
 //d3 functions
 const colorScale = chroma.scale(['#42e9f5', 'lightblue', '#ff69b6']);
 const amountScale = d3.scaleLog();
@@ -191,12 +194,12 @@ class Expenses extends Component {
  
         // calculate if the expense is being overlap another dayweek
         _.each(this.days, day => {
-            var {cx, cy, radius, dayOfweek} = day
-            if(cx - radius < expenseX && cx + radius > expenseX &&
-                cy - radius < expenseY && cy + radius > expenseY) {
-                    this.dragged = {expense, day, type: 'day'};
+            var {cx, cy, dayOfweek} = day
+            if(cx <expenseX  &&  expenseX < cx + dayWidth  &&
+            cy < expenseY && expenseY < cy + dayHeight ) {
+                this.dragged = {expense, day, type: 'day'};
                 }
-            }
+            } 
          );
     }
     
