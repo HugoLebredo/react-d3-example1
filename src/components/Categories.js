@@ -92,9 +92,10 @@ class App extends Component {
         //enter
         var enter = this.circles.enter().append('g');
         enter.append('circle')
-            .attr('fill',d => amountScale(d.total))
-            .attr('stroke','#666')
-            .attr('stroke-width',2)
+            //.attr('fill',d => amountScale(d.total))
+            .attr('stroke-width',1)
+            .attr('stroke', d => d.total ? colors.black : colors.gray)
+            .attr('fill', d => d.total ? amountScale(d.total): colors.gray);
         
         enter.append('text')
             .attr('text-anchor','middle')
@@ -102,7 +103,7 @@ class App extends Component {
         
         //enter + update selection
         this.circles = enter.merge(this.circles);
-        this.circles .select('circle')
+        this.circles.select('circle')
             .attr('r', d => d.radius)
         this.circles.select('text')
             .text(d => d.name) 
@@ -134,7 +135,7 @@ class App extends Component {
         event.subject.fx = event.subject.x;
         event.subject.fy = event.subject.y;
     
-        this.deleteIcon.style('display', 'block');
+        //this.deleteIcon.style('display', 'block');
       }
     
       dragExpense(event) {

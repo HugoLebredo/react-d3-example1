@@ -6,6 +6,8 @@ import { width, height, margin } from '../data/config';
 
 var dayHeight = 75;
 
+var formatTime = d3.timeFormat("%d/%m");
+
 var AmountScale = d3.scaleLog();
 var colorScale = chroma.scale(['#53c3ac', '#f7e883', '#e85178']);
 
@@ -39,6 +41,7 @@ const dailyAmountToCal = (Amount,selectedWeek) => {
                     focusY = height - 2 * dayHeight - 0.5 * offset * dayHeight;
                  }
                 return {
+                    dayText: formatTime(day),
                     Amount,
                     WeekDay,
                     focusX,

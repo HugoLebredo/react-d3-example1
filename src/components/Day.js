@@ -11,6 +11,7 @@ import {width, height, margin, colors} from '../data/config';
 var dayWidth = 50;
 var dayHeight = 80;
 var topPadding = 150;
+var fontSize = 20;
 
 var xScale = d3.scaleLinear().domain([0, 6])
                              .range([margin.left, width - margin.right]);
@@ -59,7 +60,7 @@ class Day extends Component {
 
     renderBacks() {
         this.rects = this.container.selectAll('.back')
-                .data(this.days, d => d.name)
+                .data(this.days)
     
         //exit
         this.rects.exit().remove();
@@ -76,22 +77,36 @@ class Day extends Component {
 
     renderDays() {
 
-        this.dailyAmount = this.container.selectAll('.days')
-            .data(this.totalsByDay, d => d.name);
+        this.dayAmount = this.container.selectAll('.days')
+            .data(this.totalsByDay,d => d.fill);
 
         //exit
-        this.dailyAmount.exit().remove();
+        this.dayAmount.exit().remove();
 
         //enter
-        this.dailyAmount = this.dailyAmount.enter().insert('rect', '.day')
+        var enter = this.dayAmount.enter().append('g')
+                    .classed('day', true)
+                    .attr('transform', d => 'translate(' + [d.focusX, d.focusY] + ')');
+
+        enter.insert('rect', '.day')
             .attr('x',-dayWidth)
             .attr('y',-dayHeight)
             .attr('width',dayWidth * 2)
             .attr('height',dayHeight * 1.5)
-            .attr('transform', d => 'translate(' + [d.focusX, d.focusY] + ')')
             .attr('fill', d => d.fill);
-            //.attr('fill', d =>colorScale(AmountScale(d.Amount)));
 
+        enter.append('text')
+            .attr('text-anchor','middle')
+            .attr('dy','.35em')
+            .attr('fill',colors.white)
+            .style('font-family', 'CatMule Caps')
+            .style('font-size', fontSize);
+
+        this.dayAmount = enter.merge(this.dayAmount);
+
+        this.dayAmount.select('text')
+            .text(d => d.dayText)
+            .attr('y', d => fontSize);
     }
 
     calculateDayPosition(date, shouldSelectedWeekCurve) {

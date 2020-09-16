@@ -2,41 +2,35 @@
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+@font-face {
+  font-family: "Libre Baskerville";
+  src: url("./fonts/LibreBaskerville-Regular.ttf");
+}
+@font-face {
+  font-family: "Libre Baskerville";
+  src: url("./fonts/LibreBaskerville-Bold.ttf");
+  font-weight: bold;
+}
+@font-face {
+  font-family: "Libre Baskerville";
+  src: url("./fonts/LibreBaskerville-Italic.ttf");
+  font-style: italic;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+@font-face {
+font-family: "CatMule Caps";
+src: url("./fonts/CatMule-Caps.otf");
 }
 
-.container{
-  font-family: Arial;
+* {
+font-family: "Libre Baskerville";
 }
 
-.App-header {
-  background-color: white;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: black;
+h1, h2, h3, h4, h5, h6 {
+font-family: 'CatMule Caps';
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+#addCategory:focus {
+outline: none;
+border-bottom: 2px solid #51aae8;
 }
