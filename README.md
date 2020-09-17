@@ -1,5 +1,7 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+This proyect is deployed here 👉 https://hugolebredo.github.io/react-d3-example1/.
+
 ## Available Scripts
 
 In the project directory, you can run:
