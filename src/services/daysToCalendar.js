@@ -11,13 +11,11 @@ const xScale = d3.scaleLinear().domain([0, 6])
 const daysToCalendar = data => {
     
     const {expenses,selectedWeek } = data;
-
+    console.log(expenses)
     var weeksExtent = d3.extent(Object.keys(expenses),d => new Date(d));
 
-    console.log('back: ',weeksExtent)
-
     var days = d3.timeDay.range(weeksExtent[0],
-        d3.timeWeek.offset(weeksExtent[1],1))
+        d3.timeDay.offset(weeksExtent[1],1))
     
     const yScale = d3.scaleLinear().domain(weeksExtent)
                                     .range([height - margin.bottom, margin.top]);
@@ -40,6 +38,7 @@ const daysToCalendar = data => {
                 })
             }).value()
     )
+    console.log(resultado);
     return resultado
 }
     
