@@ -37,7 +37,7 @@ class Day extends Component {
 
     calculateData(){
         this.expenses = transformTest(this.props);
-        console.log(this.props);
+ 
         this.days = daysToCalendar(this.props)
 
         var weeksExtent = d3.extent(this.expenses, d => d3.timeWeek.floor(d.date))
