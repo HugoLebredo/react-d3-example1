@@ -12,7 +12,6 @@ var dayWidth = 50;
 var dayHeight = 80;
 
 //d3 functions
-const colorScale = chroma.scale(['#42e9f5', 'lightblue', '#ff69b6']);
 const amountScale = d3.scaleLog();
 
 var simulation = d3.forceSimulation()

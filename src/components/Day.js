@@ -26,18 +26,18 @@ class Day extends Component {
     componentDidMount(){
         this.container = d3.select(this.refs.container);
         this.calculateData();
-        //this.renderBacks();
+        this.renderBacks();
         this.renderDays();
     }
 
     componentDidUpdate(){
         this.calculateData();
-        //this.renderBacks();
         this.renderDays();
     }
 
     calculateData(){
         this.expenses = transformTest(this.props);
+ 
         this.days = daysToCalendar(this.props)
 
         var weeksExtent = d3.extent(this.expenses, d => d3.timeWeek.floor(d.date))
@@ -53,8 +53,6 @@ class Day extends Component {
 
 
         this.totalsByDay = dailyAmountToCal(this.totalsByDay,this.props.selectedWeek);
-
-        console.log(this.totalsByDay)
         
     }
 
@@ -76,8 +74,9 @@ class Day extends Component {
     }
 
     renderDays() {
+        var t = d3.transition().duration(500);
 
-        this.dayAmount = this.container.selectAll('.days')
+        this.dayAmount = this.container.selectAll('.day')
             .data(this.totalsByDay,d => d.fill);
 
         //exit
@@ -88,25 +87,28 @@ class Day extends Component {
                     .classed('day', true)
                     .attr('transform', d => 'translate(' + [d.focusX, d.focusY] + ')');
 
-        enter.insert('rect', '.day')
+        enter.append('rect')
             .attr('x',-dayWidth)
             .attr('y',-dayHeight)
             .attr('width',dayWidth * 2)
             .attr('height',dayHeight * 1.5)
             .attr('fill', d => d.fill);
-
+        
         enter.append('text')
             .attr('text-anchor','middle')
             .attr('dy','.35em')
             .attr('fill',colors.white)
             .style('font-family', 'CatMule Caps')
-            .style('font-size', fontSize);
-
-        this.dayAmount = enter.merge(this.dayAmount);
-
-        this.dayAmount.select('text')
+            .style('font-size', fontSize)
             .text(d => d.dayText)
             .attr('y', d => fontSize);
+
+        this.dayAmount = enter.merge(this.dayAmount);
+        
+        this.dayAmount.transition(t)
+            .delay((d, i) => d.WeekDay * 50)
+            .attr('transform', d => 'translate(' + [d.focusX, d.focusY] + ')');
+              
     }
 
     calculateDayPosition(date, shouldSelectedWeekCurve) {

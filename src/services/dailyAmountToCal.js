@@ -17,7 +17,6 @@ const xScale = d3.scaleLinear().domain([0, 6])
 const dailyAmountToCal = (Amount,selectedWeek) => {
 
     var AmountExtent = d3.extent(_.values(Amount));
-    console.log(Amount)
 
     AmountScale.domain(AmountExtent);
 
@@ -50,6 +49,7 @@ const dailyAmountToCal = (Amount,selectedWeek) => {
                 }
             }).value()
     )
+    console.log(resultado)
     return resultado
 }
     
