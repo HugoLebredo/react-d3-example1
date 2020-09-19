@@ -1,7 +1,7 @@
 export var width = 800;
 export var height = 550;
 export var margin = {top:40, right:40, bottom:20, left:40};
-export var radius = 10;
+export var radius = 8;
 export var dayWidth = 50;
 export var dayHeight = 80;
 export var topPadding = 150;

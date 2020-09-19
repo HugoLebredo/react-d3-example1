@@ -10,7 +10,8 @@ const parseExpenses = data => (
             return{
                 Description,
                 Amount: d.Amount < 0 ? -d.Amount : d.Amount,
-                date
+                date,
+                categories: 0
                 }
         }
     ).groupBy(d => d3.timeWeek.floor(d.date)).value()

@@ -10,6 +10,7 @@ import {width, height, margin, radius, daysOfTheWeek, colors} from '../data/conf
 
 var dayWidth = 50;
 var dayHeight = 80;
+var fontSize = 10;
 
 //d3 functions
 const amountScale = d3.scaleLog();
@@ -19,7 +20,7 @@ var simulation = d3.forceSimulation()
     .velocityDecay(0.3)
     //.force('center',d3.forceCenter(width/2,height/2))
     //.force('charge',d3.forceManyBody(100))
-    .force('collide', d3.forceCollide(radius))
+    .force('collide', d3.forceCollide(radius + 5))
     .force('x',d3.forceX(d => d.focusX))
     .force('y',d3.forceY(d => d.focusY))
     .stop();
@@ -37,12 +38,28 @@ class Expenses extends Component {
         this.dragStart = this.dragStart.bind(this);
         this.dragExpense = this.dragExpense.bind(this);
         this.dragEnd = this.dragEnd.bind(this);
-
+        this.mouseOver = this.mouseOver.bind(this);
+        
         simulation.on('tick',this.forceTick);
     }
 
     componentDidMount(){
         this.container = d3.select(this.refs.container);
+
+        //crate tooltip shape
+        this.tooltip = d3.select(this.refs.container).append('g');
+        this.tooltip.append('rect')
+          .attr('height', fontSize + 4)
+          .attr('y', -fontSize / 2 - 2)
+          .attr('opacity', 0.85)
+          .attr('fill', colors.white);
+        this.tooltip.append('text')
+          .attr('text-anchor', 'middle')
+          .attr('dy', '.35em')
+          .attr('fill', colors.black)
+          .style('font-size', fontSize)
+          .style('pointer-events', 'none');
+
         this.calculateData();
         //this.renderDayCircles();
         //this.renderWeeks();
@@ -51,8 +68,8 @@ class Expenses extends Component {
 
         //This other examples drag is used in componentWillmount
         drag.on('start',this.dragStart)
-        .on('drag',this.dragExpense)
-        .on('end',this.dragEnd);
+            .on('drag',this.dragExpense)
+            .on('end',this.dragEnd);
     }
 
     componentDidUpdate(){
@@ -90,26 +107,27 @@ class Expenses extends Component {
 
     renderCircles(){
         //draw expenses circles
-        this.circles = this.container.selectAll('.expenses')
+        this.circles = this.container.selectAll('.expense')
             .data(this.expenses,d => d.name);
-
         //exit
         this.circles.exit().remove();
 
         //enter + update
         this.circles = this.circles.enter().append('circle')
-                        .classed('expenses',true)
-                        .merge(this.circles)
-                        .attr('r',d => radius)
+                        .classed('expense',true)
+                        .attr('fill', colors.white)
+                        .style('cursor', 'grab')
+                        .attr('r',d => d.radius)
                         .attr('fill-opacity',1)
-                        .attr('stroke-width', 5)
-                        .attr("stroke-opacity", 0)
+                        .attr('stroke-width', 2)
                         .call(drag)
+                        //.on('mouseover', this.mouseOver)
+                        //.on('mouseleave', () => this.hover.style('display', 'none'))
                         .merge(this.circles)
-                        .attr('fill', d => colors.white)
-                        .attr('stroke', d => colors.white);              
+                        .attr('stroke', d => d.categories ? colors.black : '');              
     }
 
+    //Depreciated
     renderDayCircles(){
         var days = this.container.selectAll('.days')
                         .data(this.days, d => d.name)
@@ -133,6 +151,7 @@ class Expenses extends Component {
             .text(d => d.name);
     }
 
+    //Depreciated
     renderWeeks(){
         var weeks = this.container.selectAll('.weeks')
                 .data(this.weeks, d => d.name)
@@ -184,8 +203,8 @@ class Expenses extends Component {
         //of the category center for doing the append
         _.each(this.props.categories, category => {
             var {x, y, radius} = category
-            if(x - radius/2 < expenseX && x + radius/2 > expenseX &&
-                y - radius/2 < expenseY && y + radius/2 > expenseY) {
+            if(x - radius < expenseX && x + radius > expenseX &&
+                y - radius < expenseY && y + radius > expenseY) {
                     this.dragged = {expense, category, type: 'category'};
                 }
             }
@@ -219,6 +238,21 @@ class Expenses extends Component {
 
         this.dragged = null;
     }
+
+    mouseOver(d) {
+        if (this.dragging) return;
+        //debugger
+        this.tooltip.style('display', 'block');
+        var {x, y, Description} = d;
+        console.log(d)
+        this.tooltip.attr('transform', 'translate(' + [x, y + d.radius + fontSize] + ')');
+        this.tooltip.select('text')
+         // .text(_.map(Description.split(' '), _.capitalize).join(' '));
+        var width = this.tooltip.select('text').node().getBoundingClientRect().width;
+        this.tooltip.select('rect')
+          .attr('width', width + 6)
+          .attr('x', -width / 2 - 3);
+      }
 
     render(){
         return (

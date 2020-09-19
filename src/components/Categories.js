@@ -36,7 +36,7 @@ class App extends Component {
 
     componentDidMount(){
         //this.container = d3.select(this.useRef.contenedor);
-        this.container = d3.select(this.refs.categoryContainer);
+        this.container = d3.select(this.refs.container);
         this.calculateData();
         this.renderLinks();
         this.renderCircles();
@@ -151,7 +151,7 @@ class App extends Component {
       } 
     render() {
         return (
-            <g ref="categoryContainer"/>
+            <g ref="container"/>
         );
     }
 }
