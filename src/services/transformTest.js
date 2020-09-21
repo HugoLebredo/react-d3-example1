@@ -1,18 +1,24 @@
 import _, { flatten, keyBy } from 'lodash';
 import * as d3 from 'd3';
 
-import { width, height, margin } from '../data/config';
+import { width, height, margin , radius} from '../data/config';
 
 var dayHeight = 75;
 
 const xScale = d3.scaleLinear().domain([0, 6])
                              .range([margin.left, width - margin.right]);
 
-var selectedWeekRadius = (width - margin.left - margin.right) / 2;
+var radiusScale = d3.scaleLinear().range([radius, 2 * radius]);
 
 const trasformTest = (data) => {
     
     const {expenses,selectedWeek }= data;
+
+    const flatExpenses = _.chain(expenses).map(d => d).flatten().value()
+
+    const expensesExtent = d3.extent(flatExpenses, d => d.Amount)
+    
+    radiusScale.domain(expensesExtent);
 
     var weeksExtent = d3.extent(Object.keys(expenses),d => new Date(d))
     
@@ -33,6 +39,7 @@ const trasformTest = (data) => {
             }
                 return Object.assign(d ,{
                     WeekDay,
+                    radius: radiusScale(d.Amount),
                     focusX,
                     focusY:focusY + 125,
                 })

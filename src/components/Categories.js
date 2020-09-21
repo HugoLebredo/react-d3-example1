@@ -1,15 +1,16 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import _ from 'lodash';
+import chroma from 'chroma-js';
 
-import {width, height,colors } from '../data/config';
+import {width, height, colors } from '../data/config';
 
-var radiusScale = d3.scaleLinear().range([50,90]);
-var amountScale =  d3.scaleLinear().range(['#92e0a9','#2ee882'])
+var amountScale =  d3.scaleLinear().domain([0,1000]);
+var colorScale = chroma.scale(['#53c3ac', '#f7e883', '#e85178']);
 var simulation = d3.forceSimulation()
     .alphaDecay(0.001)
     .velocityDecay(0.3)
-    .force('collide', d3.forceCollide(d => d.radius +15))
+    .force('collide', d3.forceCollide(d => d.radius + 15))
     .force('x',d3.forceX(d => d.focusX))
     .force('y',d3.forceY(d => d.focusY))
     .stop();
@@ -36,7 +37,7 @@ class App extends Component {
 
     componentDidMount(){
         //this.container = d3.select(this.useRef.contenedor);
-        this.container = d3.select(this.refs.categoryContainer);
+        this.container = d3.select(this.refs.container);
         this.calculateData();
         this.renderLinks();
         this.renderCircles();
@@ -52,18 +53,16 @@ class App extends Component {
     }
 
     calculateData(){
-        var radiusExtent = d3.extent(this.props.categories, category => category.total);
-        radiusScale.domain(radiusExtent);
-
-        amountScale.domain(radiusExtent)
-    
         this.categories = _.map(this.props.categories, category => {
             return Object.assign(category,{
                 focusX:width /2,
-                focusY: height / 3,
-                radius:radiusScale(category.total)
+                focusY: height /3,
+                radius:70,
+                fill: colorScale(amountScale(category.total)),
+                fill2: colorScale(amountScale(5000))
             })
         })
+
     }
 
     renderLinks(){
@@ -85,28 +84,35 @@ class App extends Component {
         //update
         this.circles = this.container.selectAll('g')
             .data(this.categories);
-        
+        //debugger
         //exit
         this.circles.exit().remove();
         
         //enter
         var enter = this.circles.enter().append('g');
         enter.append('circle')
+
             //.attr('fill',d => amountScale(d.total))
             .attr('stroke-width',1)
             .attr('stroke', d => d.total ? colors.black : colors.gray)
             .attr('fill', d => d.total ? amountScale(d.total): colors.gray);
+
         
         enter.append('text')
             .attr('text-anchor','middle')
-            .attr('dy','.35em');
+            .attr('dy','.35em')
+            .style('font-family', 'CatMule Caps')
+            .attr('fill', colors.black);
         
         //enter + update selection
         this.circles = enter.merge(this.circles);
         this.circles.select('circle')
             .attr('r', d => d.radius)
+            .attr('stroke', d => d.total ? colors.black : '')
+            .attr('fill', d => d.total ? d.fill: colors.gray);
+
         this.circles.select('text')
-            .text(d => d.name) 
+            .text(d => d.name);
     }
 
     forceTick(){
@@ -151,7 +157,7 @@ class App extends Component {
       } 
     render() {
         return (
-            <g ref="categoryContainer"/>
+            <g ref="container"/>
         );
     }
 }

@@ -11,6 +11,9 @@ import {width, height, margin, radius, daysOfTheWeek, colors} from '../data/conf
 var dayWidth = 50;
 var dayHeight = 80;
 
+var fontSize = 10;
+
+
 //d3 functions
 const amountScale = d3.scaleLog();
 
@@ -19,12 +22,25 @@ var simulation = d3.forceSimulation()
     .velocityDecay(0.3)
     //.force('center',d3.forceCenter(width/2,height/2))
     //.force('charge',d3.forceManyBody(100))
-    .force('collide', d3.forceCollide(radius))
+    .force('collide', d3.forceCollide(radius + 5))
     .force('x',d3.forceX(d => d.focusX))
     .force('y',d3.forceY(d => d.focusY))
     .stop();
 
 var drag = d3.drag();
+
+
+var tooltip2 = d3.select("#div_customContent")
+  .append("div")
+    .style("position", "absolute")
+    .style("visibility", "hidden")
+    .style("background-color", "white")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "10px")
+    .html("<p>I'm a tooltip written in HTML</p><img src='https://github.com/holtzy/D3-graph-gallery/blob/master/img/section/ArcSmal.png?raw=true'></img><br>Fancy<br><span style='font-size: 40px;'>Isn't it?</span>");
+
 
 class Expenses extends Component {
 
@@ -37,12 +53,28 @@ class Expenses extends Component {
         this.dragStart = this.dragStart.bind(this);
         this.dragExpense = this.dragExpense.bind(this);
         this.dragEnd = this.dragEnd.bind(this);
-
+        //this.mouseOver = this.mouseOver.bind(this);
+        
         simulation.on('tick',this.forceTick);
     }
 
     componentDidMount(){
         this.container = d3.select(this.refs.container);
+
+        //crate tooltip shape
+        this.tooltip = d3.select(this.refs.container).append('g');
+        this.tooltip.append('rect')
+          .attr('height', fontSize + 4)
+          .attr('y', -fontSize / 2 - 2)
+          .attr('opacity', 0.85)
+          .attr('fill', colors.white);
+        this.tooltip.append('text')
+          .attr('text-anchor', 'middle')
+          .attr('dy', '.35em')
+          .attr('fill', colors.black)
+          .style('font-size', fontSize)
+          .style('pointer-events', 'none');
+
         this.calculateData();
         //this.renderDayCircles();
         //this.renderWeeks();
@@ -51,8 +83,8 @@ class Expenses extends Component {
 
         //This other examples drag is used in componentWillmount
         drag.on('start',this.dragStart)
-        .on('drag',this.dragExpense)
-        .on('end',this.dragEnd);
+            .on('drag',this.dragExpense)
+            .on('end',this.dragEnd);
     }
 
     componentDidUpdate(){
@@ -90,26 +122,29 @@ class Expenses extends Component {
 
     renderCircles(){
         //draw expenses circles
-        this.circles = this.container.selectAll('.expenses')
+        this.circles = this.container.selectAll('.expense')
             .data(this.expenses,d => d.name);
-
         //exit
         this.circles.exit().remove();
 
         //enter + update
         this.circles = this.circles.enter().append('circle')
-                        .classed('expenses',true)
-                        .merge(this.circles)
-                        .attr('r',d => radius)
+                        .classed('expense',true)
+                        .attr('fill', colors.white)
+                        //.style('cursor', 'grab')
+                        .attr('r',d => d.radius)
                         .attr('fill-opacity',1)
-                        .attr('stroke-width', 5)
-                        .attr("stroke-opacity", 0)
+                        .attr('stroke-width', 2)
                         .call(drag)
+                        //.on('mouseover', this.mouseOver)
+                        //.on("mouseover", d => tooltip2.style("visibility", "visible"))
+                        //.on('mouseleave', () => this.hover.style('display', 'none'))
+                        .on("mouseout", d => tooltip2.style("visibility", "hidden"))
                         .merge(this.circles)
-                        .attr('fill', d => colors.white)
-                        .attr('stroke', d => colors.white);              
+                        .attr('stroke', d => d.categories ? colors.black : '');              
     }
 
+    //Depreciated
     renderDayCircles(){
         var days = this.container.selectAll('.days')
                         .data(this.days, d => d.name)
@@ -133,6 +168,7 @@ class Expenses extends Component {
             .text(d => d.name);
     }
 
+    //Depreciated
     renderWeeks(){
         var weeks = this.container.selectAll('.weeks')
                 .data(this.weeks, d => d.name)
@@ -184,8 +220,8 @@ class Expenses extends Component {
         //of the category center for doing the append
         _.each(this.props.categories, category => {
             var {x, y, radius} = category
-            if(x - radius/2 < expenseX && x + radius/2 > expenseX &&
-                y - radius/2 < expenseY && y + radius/2 > expenseY) {
+            if(x - radius < expenseX && x + radius > expenseX &&
+                y - radius < expenseY && y + radius > expenseY) {
                     this.dragged = {expense, category, type: 'category'};
                 }
             }
@@ -220,11 +256,18 @@ class Expenses extends Component {
         this.dragged = null;
     }
 
+///////////////
+/*
+d3.select("expense")
+  .on("mouseover", function(){return tooltip2.style("visibility", "visible");})
+  .on("mousemove", function(){return tooltip2.style("top", (event.pageY-2390)+"px").style("left",(event.pageX-800)+"px");})
+  .on("mouseout", function(){return tooltip2.style("visibility", "hidden");});
+
+
+*//////////////
     render(){
         return (
- 
-                <g ref="container"></g>
-
+                <g ref="container"/>
         )
     }
 }

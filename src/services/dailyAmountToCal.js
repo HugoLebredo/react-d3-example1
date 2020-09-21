@@ -49,7 +49,7 @@ const dailyAmountToCal = (Amount,selectedWeek) => {
                 }
             }).value()
     )
-    console.log(resultado)
+
     return resultado
 }
     

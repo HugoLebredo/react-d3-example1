@@ -61,8 +61,10 @@ class App extends Component {
   linkToCategory(expense, category){
     if (_.includes(category.expenses, expense)){
       category.expenses = _.without(category.expense, expense);
+      expense.categories -= 1
     } else {
       category.expenses.push(expense)
+      expense.categories += 1
     }
 
     category.total = _.sumBy(category.expenses,'Amount');
