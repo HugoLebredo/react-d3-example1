@@ -10,7 +10,9 @@ import {width, height, margin, radius, daysOfTheWeek, colors} from '../data/conf
 
 var dayWidth = 50;
 var dayHeight = 80;
+
 var fontSize = 10;
+
 
 //d3 functions
 const amountScale = d3.scaleLog();

@@ -91,7 +91,12 @@ class App extends Component {
         //enter
         var enter = this.circles.enter().append('g');
         enter.append('circle')
-            .attr('stroke-width',1);
+
+            //.attr('fill',d => amountScale(d.total))
+            .attr('stroke-width',1)
+            .attr('stroke', d => d.total ? colors.black : colors.gray)
+            .attr('fill', d => d.total ? amountScale(d.total): colors.gray);
+
         
         enter.append('text')
             .attr('text-anchor','middle')
