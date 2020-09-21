@@ -27,6 +27,19 @@ var simulation = d3.forceSimulation()
 
 var drag = d3.drag();
 
+
+var tooltip2 = d3.select("#div_customContent")
+  .append("div")
+    .style("position", "absolute")
+    .style("visibility", "hidden")
+    .style("background-color", "white")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "10px")
+    .html("<p>I'm a tooltip written in HTML</p><img src='https://github.com/holtzy/D3-graph-gallery/blob/master/img/section/ArcSmal.png?raw=true'></img><br>Fancy<br><span style='font-size: 40px;'>Isn't it?</span>");
+
+
 class Expenses extends Component {
 
     constructor(props){
@@ -38,7 +51,7 @@ class Expenses extends Component {
         this.dragStart = this.dragStart.bind(this);
         this.dragExpense = this.dragExpense.bind(this);
         this.dragEnd = this.dragEnd.bind(this);
-        this.mouseOver = this.mouseOver.bind(this);
+        //this.mouseOver = this.mouseOver.bind(this);
         
         simulation.on('tick',this.forceTick);
     }
@@ -116,13 +129,15 @@ class Expenses extends Component {
         this.circles = this.circles.enter().append('circle')
                         .classed('expense',true)
                         .attr('fill', colors.white)
-                        .style('cursor', 'grab')
+                        //.style('cursor', 'grab')
                         .attr('r',d => d.radius)
                         .attr('fill-opacity',1)
                         .attr('stroke-width', 2)
                         .call(drag)
                         //.on('mouseover', this.mouseOver)
+                        //.on("mouseover", d => tooltip2.style("visibility", "visible"))
                         //.on('mouseleave', () => this.hover.style('display', 'none'))
+                        .on("mouseout", d => tooltip2.style("visibility", "hidden"))
                         .merge(this.circles)
                         .attr('stroke', d => d.categories ? colors.black : '');              
     }
@@ -239,26 +254,18 @@ class Expenses extends Component {
         this.dragged = null;
     }
 
-    mouseOver(d) {
-        if (this.dragging) return;
-        //debugger
-        this.tooltip.style('display', 'block');
-        var {x, y, Description} = d;
-        console.log(d)
-        this.tooltip.attr('transform', 'translate(' + [x, y + d.radius + fontSize] + ')');
-        this.tooltip.select('text')
-         // .text(_.map(Description.split(' '), _.capitalize).join(' '));
-        var width = this.tooltip.select('text').node().getBoundingClientRect().width;
-        this.tooltip.select('rect')
-          .attr('width', width + 6)
-          .attr('x', -width / 2 - 3);
-      }
+///////////////
+/*
+d3.select("expense")
+  .on("mouseover", function(){return tooltip2.style("visibility", "visible");})
+  .on("mousemove", function(){return tooltip2.style("top", (event.pageY-2390)+"px").style("left",(event.pageX-800)+"px");})
+  .on("mouseout", function(){return tooltip2.style("visibility", "hidden");});
 
+
+*//////////////
     render(){
         return (
- 
-                <g ref="container"></g>
-
+                <g ref="container"/>
         )
     }
 }
