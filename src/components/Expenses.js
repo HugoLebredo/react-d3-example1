@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
-import chroma from 'chroma-js';
+
 import _ from 'lodash';
 
 import fitExpenses from '../services/fitExpenses';
@@ -11,7 +11,7 @@ import {width, height, margin, radius, daysOfTheWeek, colors} from '../data/conf
 var dayWidth = 50;
 var dayHeight = 80;
 
-var fontSize = 10;
+var fontSize = 15;
 
 
 //d3 functions
@@ -29,19 +29,6 @@ var simulation = d3.forceSimulation()
 
 var drag = d3.drag();
 
-
-var tooltip2 = d3.select("#div_customContent")
-  .append("div")
-    .style("position", "absolute")
-    .style("visibility", "hidden")
-    .style("background-color", "white")
-    .style("border", "solid")
-    .style("border-width", "1px")
-    .style("border-radius", "5px")
-    .style("padding", "10px")
-    .html("<p>I'm a tooltip written in HTML</p><img src='https://github.com/holtzy/D3-graph-gallery/blob/master/img/section/ArcSmal.png?raw=true'></img><br>Fancy<br><span style='font-size: 40px;'>Isn't it?</span>");
-
-
 class Expenses extends Component {
 
     constructor(props){
@@ -53,14 +40,13 @@ class Expenses extends Component {
         this.dragStart = this.dragStart.bind(this);
         this.dragExpense = this.dragExpense.bind(this);
         this.dragEnd = this.dragEnd.bind(this);
-        //this.mouseOver = this.mouseOver.bind(this);
+        this.mouseOver = this.mouseOver.bind(this);
         
         simulation.on('tick',this.forceTick);
     }
 
     componentDidMount(){
-        this.container = d3.select(this.refs.container);
-
+        this.container = d3.select(this.refs.container).append('g');
         //crate tooltip shape
         this.tooltip = d3.select(this.refs.container).append('g');
         this.tooltip.append('rect')
@@ -68,6 +54,7 @@ class Expenses extends Component {
           .attr('y', -fontSize / 2 - 2)
           .attr('opacity', 0.85)
           .attr('fill', colors.white);
+
         this.tooltip.append('text')
           .attr('text-anchor', 'middle')
           .attr('dy', '.35em')
@@ -115,7 +102,7 @@ class Expenses extends Component {
 
         this.expenses = transformTest(this.props);
         this.weeks = fitExpenses(this.props.expenses);
-
+        
         var expensesExtent = d3.extent(this.expenses, d => d.Amount);
         amountScale.domain(expensesExtent);
     }
@@ -123,7 +110,7 @@ class Expenses extends Component {
     renderCircles(){
         //draw expenses circles
         this.circles = this.container.selectAll('.expense')
-            .data(this.expenses,d => d.name);
+            .data(this.expenses, d => d.Description);
         //exit
         this.circles.exit().remove();
 
@@ -131,16 +118,15 @@ class Expenses extends Component {
         this.circles = this.circles.enter().append('circle')
                         .classed('expense',true)
                         .attr('fill', colors.white)
-                        //.style('cursor', 'grab')
-                        .attr('r',d => d.radius)
+                        .style('cursor', 'grab')
                         .attr('fill-opacity',1)
                         .attr('stroke-width', 2)
                         .call(drag)
-                        //.on('mouseover', this.mouseOver)
-                        //.on("mouseover", d => tooltip2.style("visibility", "visible"))
-                        //.on('mouseleave', () => this.hover.style('display', 'none'))
-                        .on("mouseout", d => tooltip2.style("visibility", "hidden"))
+                        .on('mouseover', (d,i) => this.mouseOver(d,i))
+                        //.on('mouseover',d => mostrarPlayBox("evento",d, this.div))
+                        .on('mouseleave', () => this.tooltip.style('display', 'none'))
                         .merge(this.circles)
+                        .attr('r',d => d.radius)
                         .attr('stroke', d => d.categories ? colors.black : '');              
     }
 
@@ -199,6 +185,9 @@ class Expenses extends Component {
     }
     
     dragStart(event) {
+        this.dragged = true;
+        this.tooltip.style('display', 'none');
+
         if (!event.active) simulation.alphaTarget(0.3).restart();
         event.subject.fx = event.subject.x;
         event.subject.fy = event.subject.y;
@@ -229,9 +218,9 @@ class Expenses extends Component {
  
         // calculate if the expense is being overlap another dayweek
         _.each(this.days, day => {
-            var {cx, cy, dayOfweek} = day
-            if(cx <expenseX  &&  expenseX < cx + dayWidth  &&
-            cy < expenseY && expenseY < cy + dayHeight ) {
+            var {cx, cy} = day
+            if(cx - dayWidth < expenseX  &&  expenseX < cx + dayWidth  &&
+                cy - dayHeight< expenseY && expenseY < cy + dayHeight ) {
                 this.dragged = {expense, day, type: 'day'};
                 }
             } 
@@ -252,19 +241,27 @@ class Expenses extends Component {
             var {expense, day} = this.dragged;
             this.props.editDate(expense, day);
         }
-
+    
         this.dragged = null;
     }
 
 ///////////////
-/*
-d3.select("expense")
-  .on("mouseover", function(){return tooltip2.style("visibility", "visible");})
-  .on("mousemove", function(){return tooltip2.style("top", (event.pageY-2390)+"px").style("left",(event.pageX-800)+"px");})
-  .on("mouseout", function(){return tooltip2.style("visibility", "hidden");});
+mouseOver(event,data) {
+    if (this.dragged) return;
+    this.tooltip.style('display', 'block');
+    
+    var {x, y, Description} = data;
+    x = x < 80 ? 80 : x;
+    this.tooltip.attr('transform', 'translate(' + [x, y + data.radius + fontSize] + ')');
+    this.tooltip.select('text')
+      .text(_.map(Description.split(' '), _.capitalize).join(' '));
+    var width = this.tooltip.select('text').node().getBoundingClientRect().width;
+    this.tooltip.select('rect')
+      .attr('width', width + 6)
+      .attr('x', - width / 2 - 3);
+  }
 
-
-*//////////////
+//////////////
     render(){
         return (
                 <g ref="container"/>
